@@ -207,10 +207,10 @@ class Home {
     }
   }
 
-  _handleReturnHome() {
+  _handleReturnHome(hrefAddress) {
     document.querySelector(".home-btn").onclick = (e) => (location.href = "/");
     document.querySelector("#logo-spotify").onclick = (e) => {
-      location.href = location.hostname + location.pathname;
+      location.href = hrefAddress;
       console.log(location.href);
     };
 
@@ -228,7 +228,10 @@ class Home {
   }
 
   async executeHome() {
-    this._handleReturnHome();
+    const href = location.href;
+    console.log(href);
+
+    this._handleReturnHome(href);
     // history.replaceState(null, null, `/`);
     await this._handleWithTopHits();
     await this._handleWithArtist();
