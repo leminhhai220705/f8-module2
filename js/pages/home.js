@@ -210,7 +210,7 @@ class Home {
   _handleReturnHome() {
     document.querySelector(".home-btn").onclick = (e) => (location.href = "/");
     document.querySelector("#logo-spotify").onclick = (e) => {
-      location.href = location.origin + location.pathname;
+      location.href = location.hostname + location.pathname;
       console.log(location.href);
     };
 
