@@ -210,9 +210,9 @@ class Home {
   _handleReturnHome(hrefAddress) {
     const baseUrl = `${hrefAddress}`;
     document.querySelector(".home-btn").onclick = (e) =>
-      (location.href = `${baseUrl}`);
+      (location.href = `/${baseUrl}`);
     document.querySelector("#logo-spotify").onclick = (e) => {
-      location.href = `${baseUrl}`;
+      location.href = `/${baseUrl}`;
       console.log(location.href);
     };
 
