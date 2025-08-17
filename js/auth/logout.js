@@ -32,7 +32,8 @@ class Logout {
   }
 
   _handleAfterLogout() {
-    location.href = "/";
+    const baseUrl = `${location.origin}/${location.pathname.split("/")[1]}/`;
+    location.href = `${baseUrl}`;
     localStorage.removeItem("access_token");
     localStorage.removeItem("login_success");
     this.userMenu.style.display = "none";
