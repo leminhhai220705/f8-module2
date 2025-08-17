@@ -1745,7 +1745,7 @@
   background-color: #181818;
 }
 
-.search-container {
+.search-wrapper {
   display: flex;
   align-items: center;
   background-color: #2a2a2a;
@@ -1753,13 +1753,13 @@
   padding: 8px;
 }
 
-.search-container i {
+.search-wrapper i {
   color: #b3b3b3;
   margin-right: 8px;
   font-size: 14px;
 }
 
-.search-container input {
+.search-wrapper input {
   background: none;
   border: none;
   color: #fff;
@@ -1768,7 +1768,7 @@
   outline: none;
 }
 
-.search-container input::placeholder {
+.search-wrapper input::placeholder {
   color: #b3b3b3;
 }
 
