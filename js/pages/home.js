@@ -75,8 +75,6 @@ class Home {
       // Get Artist's Name
       const nameArtist = artistAlbumData?.artist?.name;
 
-      console.log(artistAlbumData);
-
       if (!artistAlbumData.albums.length) return;
 
       // Get first Album of artist
@@ -92,8 +90,6 @@ class Home {
       const albumTracks = artistAlbumTrack?.tracks;
 
       publicPlaylistTracks = albumTracks;
-
-      console.log(albumTracks);
 
       // Render to Interface
       trackPage.handleRenderTrackPage(albumCoverImg, nameArtist, albumTracks);
@@ -217,7 +213,6 @@ class Home {
     document.querySelector(".home-btn").onclick = (e) => (location.href = `${baseUrl}`);
     document.querySelector("#logo-spotify").onclick = (e) => {
       location.href = `${baseUrl}`;
-      console.log(location.href);
     };
 
     document.querySelector("#logo-spotify").style.cursor = "pointer";
@@ -235,7 +230,7 @@ class Home {
 
   async executeHome() {
     const absolutePath = location.pathname.split("/")[1];
-    console.log(absolutePath);
+
     this._handleReturnHome(absolutePath);
     // history.replaceState(null, null, `/`);
     await this._handleWithTopHits();

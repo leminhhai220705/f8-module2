@@ -111,7 +111,7 @@ class NewPlaylistLogic {
 
   async _login() {
     const newPlaylistApi = await this._createNewPlaylist();
-    console.log(newPlaylistApi);
+
     if (newPlaylistApi) {
       const id = newPlaylistApi.playlist.id;
       const state = newPlaylistApi.playlist.is_public ? "public" : "private";
@@ -153,18 +153,15 @@ class NewPlaylistLogic {
 
       const data = new FormData(this.editForm);
       const fileImg = data.get("image_url");
-      console.log(fileImg);
-      console.log(playlistId);
 
       const imgData = await this._uploadPlaylistCoverImg(playlistId, fileImg);
-      console.log(imgData);
 
       data.set("image_url", imgData.file.url);
 
       const formData = Object.fromEntries(data);
 
       const dataUpdated = await this._updatePlaylistInfo(playlistId, formData);
-      console.log(dataUpdated);
+
       if (dataUpdated) {
         const playlistName = dataUpdated.playlist.name;
         const state = Boolean(dataUpdated.playlist.is_public);
@@ -240,7 +237,6 @@ class NewPlaylistLogic {
 
   async _getAllMyPlaylist() {
     const token = localStorage.getItem("access_token");
-    console.log(token);
 
     try {
       const res = httpRequest.sendApi("/me/playlists", null, "get", {
@@ -336,7 +332,7 @@ class NewPlaylistLogic {
     const finalTracks = await Promise.all(tracksBeforeHandle);
     const coverImg = finalTracks[0].image_url;
     const title = namePlaylist;
-    console.log(finalTracks);
+
     playlistTracks = finalTracks;
     trackPage.handleRenderTrackPage(coverImg, title, finalTracks);
     trackPlaying.playingTrack(playlistTracks);
@@ -381,7 +377,6 @@ class NewPlaylistLogic {
         this.addPlaylistBtn.dataset.type = "album";
         const title = playlistItem.dataset.title;
         const data = await home._getAlbumTrackApi(albumId);
-        console.log(data);
 
         home._setQueryParam(home._slugify(title), albumId);
         home._swapState();
@@ -403,19 +398,14 @@ class NewPlaylistLogic {
         playlistItem.classList.add("active");
         // Get ID of Artist through dataset
         const artistId = playlistItem.dataset.id;
-        console.log(artistId);
 
         this.addPlaylistBtn.dataset.artistid = artistId;
         this.addPlaylistBtn.dataset.type = "artist";
         // Base on ID, Get artist's album
         const artistAlbumData = await home._getArtistAlbumApi(artistId);
 
-        console.log(artistAlbumData);
-
         // Get Artist's Name
         const nameArtist = artistAlbumData?.artist?.name;
-
-        console.log(artistAlbumData);
 
         // Get first Album of artist
         const albumId = artistAlbumData?.albums[0]?.id;
@@ -431,8 +421,6 @@ class NewPlaylistLogic {
 
         const albumCoverImg = artistAlbumTrack?.album?.cover_image_url;
         const albumTracks = artistAlbumTrack?.tracks;
-
-        console.log(albumTracks);
 
         // Render to Interface
         trackPage.handleRenderTrackPage(albumCoverImg, nameArtist, albumTracks);

@@ -38,15 +38,11 @@ class Footer {
       };
 
       this.audio.onplay = () => {
-        this.playBtn
-          .querySelector("i")
-          .classList.replace("fa-play", "fa-pause");
+        this.playBtn.querySelector("i").classList.replace("fa-play", "fa-pause");
       };
 
       this.audio.onpause = () => {
-        this.playBtn
-          .querySelector("i")
-          .classList.replace("fa-pause", "fa-play");
+        this.playBtn.querySelector("i").classList.replace("fa-pause", "fa-play");
       };
 
       document.addEventListener("keydown", (e) => {
@@ -64,8 +60,7 @@ class Footer {
         const duration = this.audio.duration;
         const progressBarWidth = this.progressBar.offsetWidth;
 
-        if (isNaN(currentTime) || isNaN(duration) || isNaN(progressBarWidth))
-          return;
+        if (isNaN(currentTime) || isNaN(duration) || isNaN(progressBarWidth)) return;
 
         const percentCurrentTime = (currentTime / duration) * 100;
         const timeWidth = (percentCurrentTime / 100) * progressBarWidth;
@@ -108,33 +103,20 @@ class Footer {
   _updateChange(e) {
     const seekingPosition = e.clientX;
     const minSeekingPosition = this.progressBar.offsetLeft;
-    const maxSeekingPosition =
-      this.progressBar.offsetLeft + this.progressBar.offsetWidth;
-    const seeklimitation = Math.max(
-      minSeekingPosition,
-      Math.min(maxSeekingPosition, seekingPosition),
-    );
-    this.progressHandle.style.transform = `translate(${
-      seeklimitation - minSeekingPosition
-    }px, -50%)`;
+    const maxSeekingPosition = this.progressBar.offsetLeft + this.progressBar.offsetWidth;
+    const seeklimitation = Math.max(minSeekingPosition, Math.min(maxSeekingPosition, seekingPosition));
+    this.progressHandle.style.transform = `translate(${seeklimitation - minSeekingPosition}px, -50%)`;
     const seekingPositionViaProgressBar = Math.max(
       0,
-      Math.min(
-        this.progressBar.offsetWidth,
-        seekingPosition - this.progressBar.offsetLeft,
-      ),
+      Math.min(this.progressBar.offsetWidth, seekingPosition - this.progressBar.offsetLeft),
     );
 
-    console.log(seekingPositionViaProgressBar);
-
-    const percentage =
-      (seekingPositionViaProgressBar / this.progressBar.offsetWidth) * 100;
+    const percentage = (seekingPositionViaProgressBar / this.progressBar.offsetWidth) * 100;
     const currentTimeUpdate = (percentage / 100) * this.audio.duration;
     if (isNaN(currentTimeUpdate)) return;
     this.progressFill.style.width = `${seekingPositionViaProgressBar}px`;
 
-    this.timeStart.textContent =
-      secToMin.transferFromSecToMin(currentTimeUpdate);
+    this.timeStart.textContent = secToMin.transferFromSecToMin(currentTimeUpdate);
     return currentTimeUpdate;
   }
 

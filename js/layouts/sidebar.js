@@ -37,12 +37,9 @@ class Sidebar {
       playlists.forEach((pl) => {
         pl.hidden = true;
         if (pl.name.toLowerCase().includes(value)) {
-          console.log(true);
           pl.hidden = false;
         }
       });
-
-      console.log(playlists);
 
       await newPlaylistLogic._renderAllMyPlaylist(true, playlists);
       await newPublicPlaylist.renderLikedAlbumAndFlArtistToSidebar();

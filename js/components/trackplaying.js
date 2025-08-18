@@ -67,30 +67,21 @@ class TrackPlaying {
       this.isLoop = !this.isLoop;
       localStorage.setItem("is_loop", this.isLoop);
       this.audio.loop = this.isLoop;
-      this.isLoop === true
-        ? this.repeatBtn.classList.add("active")
-        : this.repeatBtn.classList.remove("active");
-
-      console.log(this.audio.loop);
+      this.isLoop === true ? this.repeatBtn.classList.add("active") : this.repeatBtn.classList.remove("active");
     };
   }
 
   handleShuffle() {
-    this.isShuffle
-      ? this.shuffleBtn.classList.add("active")
-      : this.shuffleBtn.classList.remove("active");
+    this.isShuffle ? this.shuffleBtn.classList.add("active") : this.shuffleBtn.classList.remove("active");
     this.shuffleBtn.onclick = () => {
       this.isShuffle = !this.isShuffle;
       localStorage.setItem("is_shuffle", this.isShuffle);
-      this.isShuffle
-        ? this.shuffleBtn.classList.add("active")
-        : this.shuffleBtn.classList.remove("active");
+      this.isShuffle ? this.shuffleBtn.classList.add("active") : this.shuffleBtn.classList.remove("active");
     };
   }
 
   _handleLogicShuffle() {
     const length = this.tracksPlayingNow.length;
-    console.log(length);
 
     if (length <= 1) return 0;
     let randomIndex = 0;
@@ -110,8 +101,6 @@ class TrackPlaying {
       // const trackAudio = e.target.closest(".track-item").dataset.audio;
 
       this.currentIndex = +e.target.closest(".track-item").dataset.index;
-
-      console.log(this.currentIndex);
 
       await this._assignUrlAudiAndPlayingActive();
       footer.handleFooter();
@@ -150,8 +139,7 @@ class TrackPlaying {
       const duration = this.audio.duration;
       const progressBarWidth = this.progressBar.offsetWidth;
 
-      if (isNaN(currentTime) || isNaN(duration) || isNaN(progressBarWidth))
-        return;
+      if (isNaN(currentTime) || isNaN(duration) || isNaN(progressBarWidth)) return;
 
       const percentCurrentTime = (currentTime / duration) * 100;
       const timeWidth = (percentCurrentTime / 100) * progressBarWidth;
@@ -232,13 +220,13 @@ class TrackPlaying {
     if (!this.tracksPlayingNow.length) return;
     const length = this.tracksPlayingNow.length;
     this.currentIndex = (this.currentIndex + length) % length;
-    console.log(this.currentIndex);
+
     await this._setPlayingActive();
     const tracksAudioUrl = this.tracksPlayingNow[this.currentIndex]?.audio_url;
     if (!tracksAudioUrl) return;
-    console.log(tracksAudioUrl);
+
     this.audio.src = tracksAudioUrl;
-    console.log(tracksAudioUrl);
+
     this.wasAssigned = true;
     this.isPlaying = true;
   }
@@ -256,8 +244,6 @@ class TrackPlaying {
     if (this.isShuffle) {
       this.currentIndex = this._handleLogicShuffle();
     } else if (this.audio.currentTime >= 2) {
-      console.log("Moved");
-
       this.currentIndex -= 0;
     } else {
       this.currentIndex -= 1;
@@ -268,42 +254,28 @@ class TrackPlaying {
   _seeking() {}
 
   _changeBtnState(prevClass, changedClass) {
-    [
-      this.playBtnLarge.querySelector("i"),
-      this.playBtn.querySelector("i"),
-    ].forEach((icon) => icon.classList.replace(prevClass, changedClass));
+    [this.playBtnLarge.querySelector("i"), this.playBtn.querySelector("i")].forEach((icon) =>
+      icon.classList.replace(prevClass, changedClass),
+    );
   }
 
   _updateChange(e) {
     const seekingPosition = e.clientX;
     const minSeekingPosition = this.progressBar.offsetLeft;
-    const maxSeekingPosition =
-      this.progressBar.offsetLeft + this.progressBar.offsetWidth;
-    const seeklimitation = Math.max(
-      minSeekingPosition,
-      Math.min(maxSeekingPosition, seekingPosition),
-    );
-    this.progressHandle.style.transform = `translate(${
-      seeklimitation - minSeekingPosition
-    }px, -50%)`;
+    const maxSeekingPosition = this.progressBar.offsetLeft + this.progressBar.offsetWidth;
+    const seeklimitation = Math.max(minSeekingPosition, Math.min(maxSeekingPosition, seekingPosition));
+    this.progressHandle.style.transform = `translate(${seeklimitation - minSeekingPosition}px, -50%)`;
     const seekingPositionViaProgressBar = Math.max(
       0,
-      Math.min(
-        this.progressBar.offsetWidth,
-        seekingPosition - this.progressBar.offsetLeft,
-      ),
+      Math.min(this.progressBar.offsetWidth, seekingPosition - this.progressBar.offsetLeft),
     );
 
-    console.log(seekingPositionViaProgressBar);
-
-    const percentage =
-      (seekingPositionViaProgressBar / this.progressBar.offsetWidth) * 100;
+    const percentage = (seekingPositionViaProgressBar / this.progressBar.offsetWidth) * 100;
     const currentTimeUpdate = (percentage / 100) * this.audio.duration;
     if (isNaN(currentTimeUpdate)) return;
     this.progressFill.style.width = `${seekingPositionViaProgressBar}px`;
 
-    this.timeStart.textContent =
-      secToMin.transferFromSecToMin(currentTimeUpdate);
+    this.timeStart.textContent = secToMin.transferFromSecToMin(currentTimeUpdate);
     return currentTimeUpdate;
   }
 

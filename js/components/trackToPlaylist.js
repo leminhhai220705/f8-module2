@@ -40,11 +40,9 @@ class TrackToPlaylist {
     this.playlistContainer.onclick = async (e) => {
       e.stopPropagation();
       const playlistPanel = e.target.closest(".playlist-item");
-      console.log(playlistPanel);
 
       if (!playlistPanel) return;
       const id = playlistPanel.dataset.id;
-      console.log(playlistPanel.classList.contains("saved"));
 
       if (playlistPanel.classList.contains("saved")) {
         playlistPanel.classList.remove("saved");
@@ -93,7 +91,6 @@ class TrackToPlaylist {
 
   async _getAllPlaylists() {
     const token = localStorage.getItem("access_token");
-    console.log(token);
 
     try {
       const res = httpRequest.sendApi("/me/playlists", null, "get", {
@@ -133,7 +130,6 @@ class TrackToPlaylist {
 
     const checkedPlaylists = allMyPlaylists.map(async (playlist) => {
       const playlistId = playlist.id;
-      console.log(playlistId);
 
       const playlistTracks = await this._getTracks(playlistId);
 
@@ -192,13 +188,14 @@ class TrackToPlaylist {
   }
 
   _resetState = (e) => {
-    console.log(e.target);
+    this.isOpen = false;
 
     if (e.target.closest("#playlist-modal")) {
       return;
     }
     this.playlistModal.style.display = "";
     this.informRegisterBefore.style.display = "";
+
     document.removeEventListener("click", this._resetState);
   };
 }

@@ -77,21 +77,21 @@ class ContextMenuHandling {
   async _handleDeletePlaylist(id, libraryItem) {
     if (libraryItem.dataset.type === "playlist") {
       const res = await this._deletePlaylist(id);
-      console.log(res);
+
       if (res) {
         this.libraryMenu.style.display = "none";
         this.sideBar.style.overflow = "";
       }
     } else if (libraryItem.dataset.type === "album") {
       const res = await this._unlikeAlbum(id);
-      console.log(res);
+
       if (res) {
         this.libraryMenu.style.display = "none";
         this.sideBar.style.overflow = "";
       }
     } else if (libraryItem.dataset.type === "artist") {
       const res = await this._unfollowArtist(id);
-      console.log(res);
+
       if (res) {
         this.libraryMenu.style.display = "none";
         this.sideBar.style.overflow = "";

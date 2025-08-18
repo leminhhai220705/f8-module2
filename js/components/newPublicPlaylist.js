@@ -22,7 +22,6 @@ class NewPublicPlaylist {
   async _renderAllLikedAlbums(extra = false) {
     const allLikedAlbums = await this._getAllLikedAlbums();
     const allAlbums = extra ? this.extraLikedAlbums : allLikedAlbums.albums;
-    console.log(allAlbums);
 
     const allAlbumsStructure = allAlbums
       .map((album) => {
@@ -50,7 +49,6 @@ class NewPublicPlaylist {
   async _renderAllFollowedArtists(extra = false) {
     const allFlArtists = await this._getAllFollowedArtists();
     const allArtists = extra ? this.extraFlArtists : allFlArtists.artists;
-    console.log(allArtists);
 
     const allArtistsStructure = allArtists
       .map((artist) => {
@@ -125,22 +123,18 @@ class NewPublicPlaylist {
 
   async _handleUnlikeAlbum() {
     const unlikeRes = await this._unlikeAlbum(this._getAlbumId());
-    console.log(unlikeRes);
   }
 
   async _handleUnfollowArtist() {
     const unflRes = await this._unfollowArtist(this._getArtistId());
-    console.log(unflRes);
   }
 
   async _handleLikeAlbum() {
     const likeRes = await this._likeAlbum(this._getAlbumId());
-    console.log(likeRes);
   }
 
   async _handleFollowArtist() {
     const flRes = await this._followArtist(this._getArtistId());
-    console.log(flRes);
   }
 
   _getAlbumId() {
@@ -171,7 +165,6 @@ class NewPublicPlaylist {
 
   async _getArtistFollowedState(artistId) {
     const token = localStorage.getItem("access_token");
-    console.log(artistId);
 
     try {
       const res = await httpRequest.sendApi(`/artists/${artistId}`, null, "get", {
