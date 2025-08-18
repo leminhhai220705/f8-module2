@@ -26,9 +26,7 @@ class TrackPage {
                     <div class="track-name">${track.title}</div>
                   </div>
                   <div class="track-plays">${track.play_count}</div>
-                  <div class="track-duration">${secToMin.transferFromSecToMin(
-                    track.duration,
-                  )}</div>
+                  <div class="track-duration">${secToMin.transferFromSecToMin(track.duration)}</div>
                   <button class="track-menu-btn">
                     <i class="fas fa-ellipsis-h"></i>
                   </button>

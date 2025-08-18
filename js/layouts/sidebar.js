@@ -1,5 +1,6 @@
 import httpRequest from "../services/httpRequest.js";
 import newPlaylistLogic from "../components/newPlaylistLogic.js";
+import newPublicPlaylist from "../components/newPublicPlaylist.js";
 
 class Sidebar {
   sortBtn = document.querySelector("#sort-btn");
@@ -43,7 +44,8 @@ class Sidebar {
 
       console.log(playlists);
 
-      newPlaylistLogic._renderAllMyPlaylist(true, playlists);
+      await newPlaylistLogic._renderAllMyPlaylist(true, playlists);
+      await newPublicPlaylist.renderLikedAlbumAndFlArtistToSidebar();
     };
   }
 
@@ -74,7 +76,8 @@ class Sidebar {
       pl.hidden = false;
     });
 
-    newPlaylistLogic._renderAllMyPlaylist(true, playlists);
+    await newPlaylistLogic._renderAllMyPlaylist(true, playlists);
+    await newPublicPlaylist.renderLikedAlbumAndFlArtistToSidebar();
     document.removeEventListener("click", this._resetStyleInput);
   };
 

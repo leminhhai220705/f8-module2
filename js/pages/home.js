@@ -4,6 +4,7 @@ import httpRequest from "../services/httpRequest.js";
 import trackPage from "./trackPage.js";
 import trackPlaying from "../components/trackplaying.js";
 import { playlistTracks } from "../components/newPlaylistLogic.js";
+import newPublicPlaylist from "../components/newPublicPlaylist.js";
 
 export let publicPlaylistTracks = [];
 
@@ -13,6 +14,7 @@ class Home {
   playListContainer = document.querySelector(".playlists-container");
   albumContainer = document.querySelector(".albums-container");
   addPlaylistBtn = document.querySelector("#add-public-playlist");
+  newPlaylist = document.querySelector("#new-playlist");
 
   constructor() {}
 
@@ -66,6 +68,7 @@ class Home {
       const artistId = artistCard.dataset.id;
 
       this.addPlaylistBtn.dataset.artistid = artistId;
+      this.addPlaylistBtn.dataset.type = "artist";
       // Base on ID, Get artist's album
       const artistAlbumData = await this._getArtistAlbumApi(artistId);
 
@@ -73,6 +76,8 @@ class Home {
       const nameArtist = artistAlbumData?.artist?.name;
 
       console.log(artistAlbumData);
+
+      if (!artistAlbumData.albums.length) return;
 
       // Get first Album of artist
       const albumId = artistAlbumData?.albums[0]?.id;
@@ -95,16 +100,15 @@ class Home {
 
       // allow to play audio after render artist to interface
       trackPlaying.playingTrack();
+
+      // Handle Add Public Playlist
+      newPublicPlaylist.handleAddPublicPlaylist("artist");
     };
   }
 
   async _getArtistAlbumApi(id) {
     try {
-      const res = await httpRequest.sendApi(
-        `/artists/${id}/albums`,
-        null,
-        "get",
-      );
+      const res = await httpRequest.sendApi(`/artists/${id}/albums`, null, "get");
 
       return res;
     } catch (error) {
@@ -152,6 +156,7 @@ class Home {
         const hitId = hitItem.dataset.id;
 
         this.addPlaylistBtn.dataset.playlistid = hitId;
+        this.addPlaylistBtn.dataset.type = "album";
         const hitTitle = hitItem.dataset.title;
         const hitData = await this._getAlbumTrackApi(hitId);
         this._setQueryParam(this._slugify(hitTitle), hitId);
@@ -166,6 +171,9 @@ class Home {
 
         // allow to play audio after render hit track to interface
         trackPlaying.playingTrack();
+
+        // Handle Add Public Playlist
+        newPublicPlaylist.handleAddPublicPlaylist("album");
       }
     };
   }
@@ -186,6 +194,7 @@ class Home {
   _swapState() {
     this.albumContainer.hidden = true;
     this.playListContainer.hidden = false;
+    this.newPlaylist.style.display = "none";
   }
 
   _setQueryParam(title, id) {
@@ -196,11 +205,7 @@ class Home {
 
   async _getAlbumTrackApi(id) {
     try {
-      const res = await httpRequest.sendApi(
-        `/albums/${id}/tracks`,
-        null,
-        "get",
-      );
+      const res = await httpRequest.sendApi(`/albums/${id}/tracks`, null, "get");
       return res;
     } catch (error) {
       console.log(error);
@@ -209,8 +214,7 @@ class Home {
 
   _handleReturnHome(hrefAddress) {
     const baseUrl = `${location.origin}/${hrefAddress}/`;
-    document.querySelector(".home-btn").onclick = (e) =>
-      (location.href = `${baseUrl}`);
+    document.querySelector(".home-btn").onclick = (e) => (location.href = `${baseUrl}`);
     document.querySelector("#logo-spotify").onclick = (e) => {
       location.href = `${baseUrl}`;
       console.log(location.href);

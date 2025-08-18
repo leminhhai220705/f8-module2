@@ -10,7 +10,7 @@ import newPublicPlaylist from "./js/components/newPublicPlaylist.js";
 import contextMenuHandling from "./js/components/contextMenuHandling.js";
 import footer from "./js/layouts/footer.js";
 import trackToPlaylist from "./js/components/trackToPlaylist.js";
-import trackPlaying from "./js/components/trackplaying.js";
+// import trackPlaying from "./js/components/trackplaying.js";
 // Auth Modal Functionality
 document.addEventListener("DOMContentLoaded", function () {
   // Get DOM elements
@@ -150,8 +150,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Handle Sidebar
   await sideBar.handleSidebar();
 
-  // Handle Add Public Playlist
-  newPublicPlaylist.handleAddPublicPlaylist();
+  // // Handle Add Public Playlist
+  // newPublicPlaylist.renderLikedAlbumAndFlArtistToSidebar();
 
   // // handle playing track
   // trackPlaying.playingTrack();

@@ -1,7 +1,8 @@
 import httpRequest from "../services/httpRequest.js";
 import trackPage from "../pages/trackPage.js";
 import trackPlaying from "./trackplaying.js";
-import { publicPlaylistTracks } from "../pages/home.js";
+import home, { publicPlaylistTracks } from "../pages/home.js";
+import newPublicPlaylist from "./newPublicPlaylist.js";
 
 export let playlistTracks = [];
 
@@ -26,12 +27,14 @@ class NewPlaylistLogic {
   likedsongLibrary = document.querySelector("#liked-song-library");
   imgChoosingHero = document.querySelector("#img-choosing-hero");
   imgChoosingInput = document.querySelector("#img-choosing");
+  addPlaylistBtn = document.querySelector("#add-public-playlist");
 
   constructor() {}
 
   async handleAllNewPlaylist() {
     if (this._wasLogined()) {
       await this._renderAllMyPlaylist();
+      await newPublicPlaylist.renderLikedAlbumAndFlArtistToSidebar();
       this._handleEditPlaylist();
     }
     this.createBtn.onclick = async (e) => {
@@ -41,6 +44,7 @@ class NewPlaylistLogic {
       } else {
         await this._login();
         await this._renderAllMyPlaylist();
+        await newPublicPlaylist.renderLikedAlbumAndFlArtistToSidebar();
         const allLibraryItems = document.querySelectorAll(".library-item");
         allLibraryItems.forEach((item) => item.classList.remove("active"));
         allLibraryItems[1].classList.add("active");
@@ -92,11 +96,7 @@ class NewPlaylistLogic {
 
   _removeInformTooltip() {
     document.addEventListener("click", (e) => {
-      if (
-        e.target.matches("#create-btn") ||
-        e.target.closest(".login-inform-tooltip")
-      )
-        return;
+      if (e.target.matches("#create-btn") || e.target.closest(".login-inform-tooltip")) return;
       if (this.informToolTip) {
         this.informToolTip.classList.remove("show");
         this.informToolTip.ontransitionend = (e) => {
@@ -136,16 +136,11 @@ class NewPlaylistLogic {
     const formData = new FormData();
     formData.append("cover", contentImg);
     try {
-      const res = await httpRequest.sendApi(
-        `/upload/playlist/${id}/cover`,
-        formData,
-        "post",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const res = await httpRequest.sendApi(`/upload/playlist/${id}/cover`, formData, "post", {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
       return res;
     } catch (error) {
       console.log(error);
@@ -175,7 +170,8 @@ class NewPlaylistLogic {
         const state = Boolean(dataUpdated.playlist.is_public);
 
         // render sidebar
-        this._renderAllMyPlaylist();
+        await this._renderAllMyPlaylist();
+        await newPublicPlaylist.renderLikedAlbumAndFlArtistToSidebar();
 
         // render playlistTrackContainer
         this.playlistState.textContent = state ? "public" : "private";
@@ -230,16 +226,11 @@ class NewPlaylistLogic {
           is_public: true,
           image_url: null,
         };
-        const res = await httpRequest.sendApi(
-          "/playlists",
-          newInfoPlaylist,
-          "post",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+        const res = await httpRequest.sendApi("/playlists", newInfoPlaylist, "post", {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-        );
+        });
         return res;
       } catch (error) {
         console.log(error);
@@ -274,17 +265,12 @@ class NewPlaylistLogic {
         .map((playlist) => {
           const html = `
           
-        <div class="library-item" data-id="${
-          playlist.id
-        }" data-type="playlist" style="display: ${
+        <div class="library-item" data-id="${playlist.id}" data-type="playlist" style="display: ${
             playlist.hidden ? "none" : ""
           }">
               <div class="item-title">${playlist.name}</div>
               <img
-                src="${
-                  playlist.image_url ??
-                  "https://i.pinimg.com/736x/ba/7a/8a/ba7a8a369e4a6a83e7d2181f1339b39b.jpg"
-                }"
+                src="${playlist.image_url ?? "https://i.pinimg.com/736x/ba/7a/8a/ba7a8a369e4a6a83e7d2181f1339b39b.jpg"}"
                 alt="${playlist.name}"
                 class="item-image"
               />
@@ -321,16 +307,11 @@ class NewPlaylistLogic {
   async _getPlaylistTracks(id) {
     const token = localStorage.getItem("access_token");
     try {
-      const res = await httpRequest.sendApi(
-        `/playlists/${id}/tracks`,
-        null,
-        "get",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const res = await httpRequest.sendApi(`/playlists/${id}/tracks`, null, "get", {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
       return res.tracks;
     } catch (error) {
       console.log(error);
@@ -364,32 +345,103 @@ class NewPlaylistLogic {
   _handleEditPlaylist() {
     this.libraryContent.onclick = async (e) => {
       const playlistItem = e.target.closest(".library-item");
-      const likedPlaylistItem = e.target.closest("#liked-song-library");
+      if (!playlistItem) return;
+      if (playlistItem.dataset.type === "playlist") {
+        const allLibraryItems = document.querySelectorAll(".library-item");
+        allLibraryItems.forEach((item) => item.classList.remove("active"));
 
-      if (!playlistItem || likedPlaylistItem) return;
+        playlistItem.classList.add("active");
+        const id = playlistItem.dataset.id;
+        const res = await this._getPlaylist(id);
 
-      const allLibraryItems = document.querySelectorAll(".library-item");
-      allLibraryItems.forEach((item) => item.classList.remove("active"));
-
-      playlistItem.classList.add("active");
-      const id = playlistItem.dataset.id;
-      const res = await this._getPlaylist(id);
-
-      if (res) {
-        const state = Boolean(res.is_public);
-        const namePlaylist = res.name;
-        this.playlistState.textContent = state ? "public" : "private";
-        this.playlistName.textContent = namePlaylist;
-        if (res.total_tracks) {
-          try {
-            const res = this._renderTrack(id, namePlaylist);
-          } catch (error) {
-            console.log(error);
+        if (res) {
+          const state = Boolean(res.is_public);
+          const namePlaylist = res.name;
+          this.playlistState.textContent = state ? "public" : "private";
+          this.playlistName.textContent = namePlaylist;
+          if (res.total_tracks) {
+            try {
+              const res = this._renderTrack(id, namePlaylist);
+            } catch (error) {
+              console.log(error);
+            }
+          } else {
+            this._openNewPlaylistTrackContainer();
           }
-        } else {
-          this._openNewPlaylistTrackContainer();
+          this._handleOpenModal(id);
         }
-        this._handleOpenModal(id);
+      } else if (playlistItem.dataset.type === "album") {
+        const allLibraryItems = document.querySelectorAll(".library-item");
+        allLibraryItems.forEach((item) => item.classList.remove("active"));
+
+        playlistItem.classList.add("active");
+        const albumId = playlistItem.dataset.id;
+
+        this.addPlaylistBtn.dataset.playlistid = albumId;
+        this.addPlaylistBtn.dataset.type = "album";
+        const title = playlistItem.dataset.title;
+        const data = await home._getAlbumTrackApi(albumId);
+        console.log(data);
+
+        home._setQueryParam(home._slugify(title), albumId);
+        home._swapState();
+        const albumCoverImg = data?.album.cover_image_url;
+        const albumTitle = data?.album.title;
+        const albumTracks = data?.tracks;
+
+        trackPage.handleRenderTrackPage(albumCoverImg, albumTitle, albumTracks);
+
+        // allow to play audio after render hit track to interface
+        trackPlaying.playingTrack(albumTracks);
+
+        // Handle Add Public Playlist
+        newPublicPlaylist.handleAddPublicPlaylist("album");
+      } else if (playlistItem.dataset.type === "artist") {
+        const allLibraryItems = document.querySelectorAll(".library-item");
+        allLibraryItems.forEach((item) => item.classList.remove("active"));
+
+        playlistItem.classList.add("active");
+        // Get ID of Artist through dataset
+        const artistId = playlistItem.dataset.id;
+        console.log(artistId);
+
+        this.addPlaylistBtn.dataset.artistid = artistId;
+        this.addPlaylistBtn.dataset.type = "artist";
+        // Base on ID, Get artist's album
+        const artistAlbumData = await home._getArtistAlbumApi(artistId);
+
+        console.log(artistAlbumData);
+
+        // Get Artist's Name
+        const nameArtist = artistAlbumData?.artist?.name;
+
+        console.log(artistAlbumData);
+
+        // Get first Album of artist
+        const albumId = artistAlbumData?.albums[0]?.id;
+
+        if (!artistAlbumData.albums.length) return;
+
+        // if (!albumId) return;
+
+        // Base on Album ID, get Album Track
+        const artistAlbumTrack = await home._getAlbumTrackApi(albumId);
+
+        home._swapState();
+
+        const albumCoverImg = artistAlbumTrack?.album?.cover_image_url;
+        const albumTracks = artistAlbumTrack?.tracks;
+
+        console.log(albumTracks);
+
+        // Render to Interface
+        trackPage.handleRenderTrackPage(albumCoverImg, nameArtist, albumTracks);
+
+        // allow to play audio after render artist to interface
+        trackPlaying.playingTrack(albumTracks);
+
+        // Handle Add Public Playlist
+        newPublicPlaylist.handleAddPublicPlaylist("artist");
       }
     };
   }

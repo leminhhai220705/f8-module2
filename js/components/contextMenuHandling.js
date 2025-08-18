@@ -1,5 +1,6 @@
 import httpRequest from "../services/httpRequest.js";
 import newPlaylistLogic from "./newPlaylistLogic.js";
+import newPublicPlaylist from "./newPublicPlaylist.js";
 
 class ContextMenuHandling {
   libraryMenu = document.querySelector("#library-menu");
@@ -27,8 +28,14 @@ class ContextMenuHandling {
         const id = libraryItem.dataset.id;
         if (libraryItem.dataset.type === "playlist") {
           this.libraryMenu.textContent = "Delete";
-          await this._handleDeletePlaylist(id);
+        } else if (libraryItem.dataset.type === "album") {
+          this.libraryMenu.textContent = "Unlike";
+        } else if (libraryItem.dataset.type === "artist") {
+          this.libraryMenu.textContent = "Unfollow";
         }
+        this.libraryMenu.onclick = async (e) => {
+          await this._handleDeletePlaylist(id, libraryItem);
+        };
       }
     };
 
@@ -39,31 +46,70 @@ class ContextMenuHandling {
     };
   }
 
-  async _handleDeletePlaylist(id) {
-    this.libraryMenu.onclick = async (e) => {
+  async _unlikeAlbum(albumId) {
+    const token = localStorage.getItem("access_token");
+    try {
+      const res = await httpRequest.sendApi(`/albums/${albumId}/like`, null, "delete", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async _unfollowArtist(artistId) {
+    const token = localStorage.getItem("access_token");
+    try {
+      const res = await httpRequest.sendApi(`/artists/${artistId}/follow`, null, "delete", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async _handleDeletePlaylist(id, libraryItem) {
+    if (libraryItem.dataset.type === "playlist") {
       const res = await this._deletePlaylist(id);
       console.log(res);
       if (res) {
         this.libraryMenu.style.display = "none";
         this.sideBar.style.overflow = "";
-        await newPlaylistLogic._renderAllMyPlaylist();
       }
-    };
+    } else if (libraryItem.dataset.type === "album") {
+      const res = await this._unlikeAlbum(id);
+      console.log(res);
+      if (res) {
+        this.libraryMenu.style.display = "none";
+        this.sideBar.style.overflow = "";
+      }
+    } else if (libraryItem.dataset.type === "artist") {
+      const res = await this._unfollowArtist(id);
+      console.log(res);
+      if (res) {
+        this.libraryMenu.style.display = "none";
+        this.sideBar.style.overflow = "";
+      }
+    }
+
+    await newPlaylistLogic._renderAllMyPlaylist();
+    await newPublicPlaylist.renderLikedAlbumAndFlArtistToSidebar();
   }
 
   async _deletePlaylist(id) {
     const token = localStorage.getItem("access_token");
     try {
-      const res = await httpRequest.sendApi(
-        `/playlists/${id}`,
-        null,
-        "delete",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const res = await httpRequest.sendApi(`/playlists/${id}`, null, "delete", {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       return res;
     } catch (error) {

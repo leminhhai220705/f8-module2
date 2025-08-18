@@ -1,5 +1,6 @@
 import httpRequest from "../services/httpRequest.js";
 import newPlaylistLogic from "./newPlaylistLogic.js";
+import newPublicPlaylist from "./newPublicPlaylist.js";
 
 class TrackToPlaylist {
   informRegisterBefore = document.querySelector("#inform-register-before");
@@ -62,16 +63,11 @@ class TrackToPlaylist {
       position: 0,
     };
     try {
-      const res = await httpRequest.sendApi(
-        `/playlists/${id}/tracks`,
-        body,
-        "post",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const res = await httpRequest.sendApi(`/playlists/${id}/tracks`, body, "post", {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       return res;
     } catch (error) {
@@ -83,16 +79,11 @@ class TrackToPlaylist {
     const token = localStorage.getItem("access_token");
     const trackId = this._getTrackIdInLcStr();
     try {
-      const res = await httpRequest.sendApi(
-        `/playlists/${id}/tracks/${trackId}`,
-        null,
-        "delete",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const res = await httpRequest.sendApi(`/playlists/${id}/tracks/${trackId}`, null, "delete", {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       return res;
     } catch (error) {
@@ -128,14 +119,9 @@ class TrackToPlaylist {
   async _getTracks(id) {
     const token = localStorage.getItem("access_token");
     try {
-      const playlistTracks = await httpRequest.sendApi(
-        `/playlists/${id}/tracks`,
-        null,
-        "get",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const playlistTracks = await httpRequest.sendApi(`/playlists/${id}/tracks`, null, "get", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       return playlistTracks;
     } catch (err) {
       console.log(err);
@@ -153,9 +139,7 @@ class TrackToPlaylist {
 
       const allTracks = playlistTracks.tracks;
 
-      const resultChecking = allTracks.some(
-        (track) => track.track_id === this._getTrackIdInLcStr(),
-      );
+      const resultChecking = allTracks.some((track) => track.track_id === this._getTrackIdInLcStr());
 
       return { playlist, match: resultChecking };
     });
@@ -172,13 +156,10 @@ class TrackToPlaylist {
   _renderAllMyPlaylist(playlists) {
     const playlistHtml = playlists
       .map((playlist) => {
-        const html = `<li class="playlist-item ${
-          playlist.save ? "saved" : ""
-        }" data-id="${playlist.id}">
+        const html = `<li class="playlist-item ${playlist.save ? "saved" : ""}" data-id="${playlist.id}">
                   <img
                     src="${
-                      playlist.image_url ||
-                      "https://i.pinimg.com/736x/ba/7a/8a/ba7a8a369e4a6a83e7d2181f1339b39b.jpg"
+                      playlist.image_url || "https://i.pinimg.com/736x/ba/7a/8a/ba7a8a369e4a6a83e7d2181f1339b39b.jpg"
                     }"
                     alt="Playlist cover"
                   />
